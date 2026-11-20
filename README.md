@@ -13,12 +13,14 @@
 
 | Service | Variable | Value | Notes |
 |---|---|---|---|
-| linkace | `APP_KEY` | generated secret | Laravel encryption key (32 characters, encoded to base64 at boot). Keep it stable. |
+| linkace | `APP_KEY` | generated secret | Laravel encryption key (`${{secret(32)}}`, encoded to a valid `base64:` key at boot). Keep it stable. |
 | linkace | `APP_URL` | `https://${{RAILWAY_PUBLIC_DOMAIN}}` | Public URL used in links and notifications. |
 | linkace | `DB_HOST` | `${{postgres.RAILWAY_PRIVATE_DOMAIN}}` | Postgres host on the private network. |
 | linkace | `DB_PASSWORD` | `${{postgres.POSTGRES_PASSWORD}}` | Postgres password. |
 | linkace | `LINKACE_ADMIN_PASSWORD` | generated secret | Password of the first admin (`admin@example.com`). |
 | postgres | `POSTGRES_PASSWORD` | generated secret | Postgres superuser password. |
+
+`TRUSTED_HOSTS=.*` and `TRUSTED_PROXIES=*` are baked into the image so Railway healthchecks (which call `/login` as localhost) and the public domain both succeed.
 
 ## How to use
 

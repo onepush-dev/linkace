@@ -2,19 +2,40 @@
 set -e
 cd /app
 
-# Laravel wants APP_KEY as base64:<32 bytes>. Accept a raw 32-char secret and encode it.
+# Laravel wants APP_KEY as base64:<16, 24 or 32 raw bytes>.
+# ${{secret(32)}} is 32 ASCII chars and encodes directly; any other length is
+# hashed to a stable 32-byte key so a fresh deploy never needs user input.
 case "$APP_KEY" in
   base64:*) ;;
-  "") echo "[railway] APP_KEY is required"; exit 1 ;;
-  *) APP_KEY="base64:$(printf %s "$APP_KEY" | base64 | tr -d '\n')" ;;
+  "")
+    echo "[railway] APP_KEY is required (set it to \${{secret(32)}})"
+    exit 1
+    ;;
+  *)
+    raw_len=$(printf %s "$APP_KEY" | wc -c)
+    if [ "$raw_len" -eq 16 ] || [ "$raw_len" -eq 24 ] || [ "$raw_len" -eq 32 ]; then
+      APP_KEY="base64:$(printf %s "$APP_KEY" | base64 | tr -d '\n')"
+    else
+      APP_KEY="base64:$(printf %s "$APP_KEY" | openssl dgst -binary -sha256 | base64 | tr -d '\n')"
+    fi
+    ;;
 esac
 export APP_KEY
+
+# TrustHosts is generated from APP_URL by default, so Railway's localhost
+# healthcheck (Host: localhost / ::1) gets HTTP 400. '.*' is a documented
+# regex that also covers the public domain and custom domains.
+TRUSTED_HOSTS="${TRUSTED_HOSTS:-.*}"
+export TRUSTED_HOSTS
+TRUSTED_PROXIES="${TRUSTED_PROXIES:-*}"
+export TRUSTED_PROXIES
 
 # Render the .env upstream expects from the service variables (nothing has to be mounted).
 {
   echo "APP_KEY=$APP_KEY"
   echo "APP_URL=${APP_URL:-http://localhost}"
-  echo "TRUSTED_PROXIES=${TRUSTED_PROXIES:-*}"
+  echo "TRUSTED_PROXIES=$TRUSTED_PROXIES"
+  echo "TRUSTED_HOSTS=$TRUSTED_HOSTS"
   echo "DB_CONNECTION=${DB_CONNECTION:-pgsql}"
   echo "DB_HOST=${DB_HOST}"
   echo "DB_PORT=${DB_PORT:-5432}"

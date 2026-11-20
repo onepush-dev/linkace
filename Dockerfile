@@ -13,6 +13,7 @@ ENV PORT=8080 \
     DB_DATABASE=postgres \
     DB_USERNAME=postgres \
     TRUSTED_PROXIES='*' \
+    TRUSTED_HOSTS='.*' \
     LINKACE_ADMIN_NAME=admin \
     LINKACE_ADMIN_EMAIL=admin@example.com
 EXPOSE 8080
