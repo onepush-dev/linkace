@@ -2,7 +2,7 @@
 
 [LinkAce](https://github.com/Kovah/LinkAce) (GPL-3.0) — a self-hosted bookmark archive: tags, lists, notes, automatic link monitoring, Wayback Machine backups, import/export and a REST API. Deploy it on Railway with one click.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/PLACEHOLDER)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/kIOTeN)
 
 ## What this template runs
 
