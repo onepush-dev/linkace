@@ -76,4 +76,14 @@ fi
   done
 ) &
 
+# Railway's edge is not in private_ranges, so Caddy would drop X-Forwarded-Proto
+# and Laravel would redirect / to http://.../login. Trust all proxies here.
+if ! grep -q 'trusted_proxies static private_ranges' /etc/caddy/Caddyfile; then
+  echo "[railway] unexpected Caddyfile; cannot trust Railway proxy"
+  cat /etc/caddy/Caddyfile
+  exit 1
+fi
+sed -i 's/trusted_proxies static private_ranges/trusted_proxies static private_ranges 0.0.0.0\/0 ::\/0/' /etc/caddy/Caddyfile
+echo "[railway] Caddy trusts Railway edge proxies"
+
 exec /usr/bin/supervisord -c /etc/supervisor.d/supervisord.ini

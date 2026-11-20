@@ -20,7 +20,7 @@
 | linkace | `LINKACE_ADMIN_PASSWORD` | generated secret | Password of the first admin (`admin@example.com`). |
 | postgres | `POSTGRES_PASSWORD` | generated secret | Postgres superuser password. |
 
-`TRUSTED_HOSTS=.*` and `TRUSTED_PROXIES=*` are baked into the image so Railway healthchecks (which call `/login` as localhost) and the public domain both succeed.
+`TRUSTED_HOSTS=.*` and `TRUSTED_PROXIES=*` are baked into the image so Railway healthchecks (which call `/login` as localhost) and the public domain both succeed. The wrapper also trusts Railway's edge in Caddy so `X-Forwarded-Proto` is honoured and redirects stay on HTTPS.
 
 ## How to use
 
